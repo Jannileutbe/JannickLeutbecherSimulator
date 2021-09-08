@@ -1,19 +1,17 @@
 public class Ladybug {
 
+    private Territory territory;
     private int direction;
     private int fruitFuel;
-    private int xCoordinate;
     private int yCoordinate;
-    private int playingfieldColoumns;
-    private int playingfieldLines;
+    private int xCoordinate;
 
-    public Ladybug(int playingfieldColoumns, int playingfieldLines) {
-        this.playingfieldColoumns = playingfieldColoumns;
-        this.playingfieldLines = playingfieldLines;
+    public Ladybug(Territory territory) {
+        this.territory = territory;
         this.direction = 1;
         this.fruitFuel = 0;
-        this.xCoordinate = 0;
         this.yCoordinate = 0;
+        this.xCoordinate = 0;
     }
 
     public void printLadybug(){
@@ -35,38 +33,45 @@ public class Ladybug {
         }
     }
 
-    public void moveForward() throws RanIntoWallException {
+    public void moveForward() throws RanOutsideFieldException {
         switch(direction) {
             case 0:
-                this.xCoordinate--;
+                this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(false);
+                this.yCoordinate--;
                 break;
             case 1:
-                this.yCoordinate++;
-                break;
-            case 2:
+                this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(false);
                 this.xCoordinate++;
                 break;
+            case 2:
+                this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(false);
+                this.yCoordinate++;
+                break;
             case 3:
-                this.yCoordinate--;
+                this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(false);
+                this.xCoordinate--;
                 break;
             default:
                 System.err.println("X");
         }
-        if (this.xCoordinate < 0 || this.xCoordinate >= playingfieldColoumns || this.yCoordinate < 0 || this.yCoordinate >= playingfieldLines ) {
-            throw new RanIntoWallException();
+        if (this.yCoordinate < 0 || this.yCoordinate >= territory.getZeilen() ||
+            this.xCoordinate < 0 || this.xCoordinate >= territory.getSpalten() ) {
+            throw new RanOutsideFieldException();
         }
+        this.territory.getPlayingField()[xCoordinate][yCoordinate].setLadybugThere(true);
+
     }
 
     public void rightTurn(){
         this.direction = (this.direction+1)%4;
     }
 
-    public int getxCoordinate() {
-        return xCoordinate;
-    }
-
     public int getyCoordinate() {
         return yCoordinate;
+    }
+
+    public int getxCoordinate() {
+        return xCoordinate;
     }
 
 

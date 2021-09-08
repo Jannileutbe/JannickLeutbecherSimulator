@@ -1,50 +1,79 @@
 public class Territory {
 
 
-    private int[][] playingField;
+    private Tile[][] playingField;
     private Ladybug ladybug;
-    private int coloumns;
-    private int lines;
+    private int spalten;
+    private int zeilen;
 
-    public Territory(int columns, int lines){
-        this.playingField = new int[columns][lines];
-        this.coloumns = columns;
-        this.lines = lines;
-        ladybug = new Ladybug(columns, lines);
+    public Territory(int zeilen, int spalten){
+        this.playingField = new Tile[zeilen][spalten];
+        this.zeilen = zeilen;
+        this.spalten = spalten;
+        for (int i = 0; i < zeilen; i++) {
+            for (int j = 0; j < spalten; j++) {
+                if (i + j == 0) {
+                    playingField[i][j] = new Tile(true);
+                } else {
+                    playingField[i][j] = new Tile();
+                }
+            }
+        }
+        this.ladybug = new Ladybug(this);
     }
 
     public Territory(){
-        this.playingField = new int[5][5];
-        this.coloumns = 5;
-        this.lines = 5;
-        ladybug = new Ladybug(5, 5);
+        int zeilen = 5;
+        int spalten = 5;
+        this.zeilen = zeilen;
+        this.zeilen = spalten;
+        this.playingField = new Tile[zeilen][spalten];
+        for (int i = 0; i < zeilen; i++) {
+            for (int j = 0; j < spalten; j++) {
+                if (i + j == 0) {
+                    playingField[i][j] = new Tile(true);
+                } else {
+                    playingField[i][j] = new Tile();
+                }
+            }
+        }
+        this.ladybug = new Ladybug(this);
+    }
+
+    public void placeWood(int zeile, int spalte){
+        playingField[zeile][spalte].setState(1);
+    }
+
+    public void placeFruit(int zeile, int spalte){
+        playingField[zeile][spalte].setState(2);
     }
 
     public void printPlayingField() {
-        for (int i = 0; i < playingField.length; i++) {
-            for (int j = 0; j < playingField[i].length; j++) {
-                if (i == ladybug.getxCoordinate() && j == ladybug.getyCoordinate()) {
+        for (int i = 0; i < zeilen; i++) {
+            for (int j = 0; j < spalten; j++) {
+                if (i == ladybug.getyCoordinate() && j == ladybug.getxCoordinate()) {
                     ladybug.printLadybug();
                 } else {
-                    System.out.print("O");
+                    playingField[i][j].printTile();
                 }
             }
             System.out.println();
         }
     }
 
-
-
-
     public Ladybug getLadybug() {
         return ladybug;
     }
 
-    public int getColoumns() {
-        return coloumns;
+    public int getZeilen() {
+        return zeilen;
     }
 
-    public int getLines() {
-        return lines;
+    public int getSpalten() {
+        return spalten;
+    }
+
+    public Tile[][] getPlayingField() {
+        return playingField;
     }
 }
