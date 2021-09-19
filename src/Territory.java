@@ -40,14 +40,6 @@ public class Territory {
         this.ladybug = new Ladybug(this);
     }
 
-    public void placeWood(int zeile, int spalte){
-        playingField[zeile][spalte].setState(1);
-    }
-
-    public void placeFruit(int zeile, int spalte){
-        playingField[zeile][spalte].setState(2);
-    }
-
     public void printPlayingField() {
         for (int i = 0; i < zeilen; i++) {
             for (int j = 0; j < spalten; j++) {
@@ -59,6 +51,18 @@ public class Territory {
             }
             System.out.println();
         }
+    }
+
+    public void resizeTerritory(int zeilen, int spalten) {
+        Territory oldTerritory = this;
+    }
+
+    public void placeWood(int zeile, int spalte){
+        playingField[zeile][spalte].setState(1);
+    }
+
+    public void placeFruit(int zeile, int spalte){
+        playingField[zeile][spalte].setState(2);
     }
 
     public Ladybug getLadybug() {

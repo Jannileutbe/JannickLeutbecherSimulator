@@ -14,18 +14,28 @@ public class Tile {
 
   public void printTile(){
     switch (state) {
-      case 0:
+      case 0: // Free Field
         System.out.print("O");
         break;
-      case 1:
-        System.out.print("H");
+      case 1: // Field with Piece of Wood
+        System.out.print("W");
         break;
-      case 2:
+      case 2: // Field with Fruit
         System.out.print("F");
+        break;
+      case 3: // Field with Leaf
+        System.out.print("L");
+        break;
+      case 4: // Field with Fruit under piece of Wood
+        System.out.print("S");
         break;
       default:
         System.err.print("X");
     }
+  }
+
+  public boolean isFruitThere(){
+    return state == 2;
   }
 
   public boolean isLadybugThere() {

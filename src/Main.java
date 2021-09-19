@@ -18,12 +18,16 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
+
+    private Territory territory;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
+        this.territory = new Territory();
         VBox gameWindow = createGameWindow();
         StackPane root = new StackPane();
         root.getChildren().add(gameWindow);
@@ -222,9 +226,9 @@ public class Main extends Application {
         SplitPane splitPane = new SplitPane();
 
         TextArea leftControl = new TextArea();
-        VBox rightControl = new VBox();
+        TerritoryPanel territoryPanel = new TerritoryPanel(this.territory);
 
-        splitPane.getItems().addAll(leftControl, rightControl);
+        splitPane.getItems().addAll(leftControl, territoryPanel);
 
         return splitPane;
     }

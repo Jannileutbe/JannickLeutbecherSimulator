@@ -5,13 +5,14 @@ public class Ladybug {
     private int fruitFuel;
     private int yCoordinate;
     private int xCoordinate;
+    private boolean isAirborne;
 
     public Ladybug(Territory territory) {
         this.territory = territory;
         this.direction = 1;
         this.fruitFuel = 0;
-        this.yCoordinate = 0;
         this.xCoordinate = 0;
+        this.yCoordinate = 0;
     }
 
     public void printLadybug(){
@@ -33,7 +34,7 @@ public class Ladybug {
         }
     }
 
-    public void moveForward() throws RanOutsideFieldException {
+    public void moveForward() throws RanOutsideFieldException, RanAgainstWallException{
         switch(direction) {
             case 0:
                 this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(false);
@@ -58,7 +59,19 @@ public class Ladybug {
             this.xCoordinate < 0 || this.xCoordinate >= territory.getSpalten() ) {
             throw new RanOutsideFieldException();
         }
-        this.territory.getPlayingField()[xCoordinate][yCoordinate].setLadybugThere(true);
+        if (this.territory.getPlayingField()[this.yCoordinate][this.xCoordinate].getState() == 1) {
+            throw new RanAgainstWallException();
+        }
+        this.territory.getPlayingField()[yCoordinate][xCoordinate].setLadybugThere(true);
+
+    }
+
+    public void eatFruit(){
+        Tile currentTile = this.territory.getPlayingField()[this.yCoordinate][this.xCoordinate];
+        if (currentTile.isFruitThere()) {
+            currentTile.setState(0);
+            this.fruitFuel += 3;
+        }
 
     }
 
@@ -72,6 +85,10 @@ public class Ladybug {
 
     public int getxCoordinate() {
         return xCoordinate;
+    }
+
+    public int getFruitFuel(){
+        return fruitFuel;
     }
 
 
