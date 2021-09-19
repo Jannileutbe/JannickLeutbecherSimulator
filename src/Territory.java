@@ -26,7 +26,7 @@ public class Territory {
         int zeilen = 5;
         int spalten = 5;
         this.zeilen = zeilen;
-        this.zeilen = spalten;
+        this.spalten = spalten;
         this.playingField = new Tile[zeilen][spalten];
         for (int i = 0; i < zeilen; i++) {
             for (int j = 0; j < spalten; j++) {
