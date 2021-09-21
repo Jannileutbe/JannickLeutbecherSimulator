@@ -8,7 +8,9 @@ public class TerritoryPanel extends Region {
 
   private final Territory territory;
   private final GraphicsContext gc;
-/*
+
+  private final Image imageLog = new Image("https://i.postimg.cc/L6xRrDDB/Log.png");
+  /*
 
   private final Image imageLog = new Image(getClass().getResource(".\\resources\\LadybugAdventure\\Log.png").toString());
   private final Image imageFruit = new Image(getClass().getResource(".\\resources\\LadybugAdventure\\Cherry.png").toString());
@@ -18,7 +20,6 @@ public class TerritoryPanel extends Region {
   private final Image imageFlyingLadybug = new Image(getClass().getResource(".\\resources\\LadybugAdventure\\FlyingLadybug.png").toString());
 
  */
-
 
   public TerritoryPanel(Territory territory){
     this.territory = territory;
@@ -31,6 +32,8 @@ public class TerritoryPanel extends Region {
     this.setVisible(true);
   }
 
+
+  // Mit Dana Warmbold zusammengearbeitet
   private void buildPlayingField(){
     int xCoordinate;
     int yCoordinate = 35;
@@ -48,6 +51,7 @@ public class TerritoryPanel extends Region {
     }
   }
 
+  // Mit Dana Warmbold zusammengearbeitet
   private void buildTile(int xCoordinate, int yCoordinate, Tile tile){
     gc.setFill(Color.DARKOLIVEGREEN);
     gc.setStroke(Color.SIENNA);
@@ -59,7 +63,7 @@ public class TerritoryPanel extends Region {
       case 0:
         break;
       case 1:
-        //gc.drawImage(this.imageLog, xCoordinate, yCoordinate);
+        gc.drawImage(this.imageLog, xCoordinate, yCoordinate, 32, 32);
         break;
       case 2:
         //gc.drawImage(this.imageFruit, xCoordinate, yCoordinate);

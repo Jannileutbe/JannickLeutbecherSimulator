@@ -37,6 +37,12 @@ public class Territory {
                 }
             }
         }
+        this.playingField[1][1].setState(1);
+        this.playingField[3][2].setState(1);
+        this.playingField[2][4].setState(1);
+        this.playingField[4][4].setState(1);
+        this.playingField[2][1].setState(1);
+
         this.ladybug = new Ladybug(this);
     }
 
