@@ -8,25 +8,44 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 //Zur Hilfe wurden die Folien aus dem StudIP genommen
 
 
 public class Main extends Application {
 
+    private final Image imageNew = new Image(new FileInputStream("./resources/New24.gif"));
+    private final Image imageOpen = new Image(new FileInputStream("./resources/Open24.gif"));
+    private final Image imageSafe = new Image(new FileInputStream("./resources/Save24.gif"));
+    private final Image imageCompile = new Image(new FileInputStream("./resources/Compile24.gif"));
+    private final Image imageTerrain = new Image(new FileInputStream("./resources/Terrain24.gif"));
+    private final Image imageLadybugMoving = new Image(new FileInputStream("./resources/LadybugAdventure/LadybugGIF.gif"));
+    private final Image imageCherry = new Image(new FileInputStream("./resources/LadybugAdventure/Cherry.png"));
+    private final Image imageLog = new Image(new FileInputStream("./resources/LadybugAdventure/Log.png"));
+    private final Image imageDelete = new Image(new FileInputStream("./resources/Delete24.gif"));
+
     private Territory territory;
+
+    public Main() throws FileNotFoundException {
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws FileNotFoundException {
         this.territory = new Territory();
         VBox gameWindow = createGameWindow();
         StackPane root = new StackPane();
@@ -39,7 +58,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    private VBox createGameWindow() {
+    private VBox createGameWindow() throws FileNotFoundException {
         VBox vBox = new VBox();
 
         MenuBar menuBar = addMenuBar();
@@ -216,13 +235,42 @@ public class Main extends Application {
     }
 
     private ToolBar addToolBar(){
-        ToolBar toolBar = new ToolBar(
-                new Button("Neu"), new Button("Öffnen"), new Button("Speichern"),
-                new Button("Kompilieren"));
+        ToolBar toolBar = new ToolBar();
+
+        Button newFile = new Button();
+        newFile.setGraphic(new ImageView(this.imageNew));
+
+        Button openFile = new Button();
+        openFile.setGraphic(new ImageView(this.imageOpen));
+
+        Button safeFile = new Button();
+        safeFile.setGraphic(new ImageView(this.imageSafe));
+
+        Button compileFile = new Button();
+        compileFile.setGraphic(new ImageView(this.imageCompile));
+
+        Button resizeTerritory = new Button();
+        resizeTerritory.setGraphic(new ImageView(this.imageTerrain));
+
+        Button ladybug = new Button();
+        ladybug.setGraphic(new ImageView(this.imageLadybugMoving));
+
+        Button cherry = new Button();
+        cherry.setGraphic(new ImageView(this.imageCherry));
+
+        Button log = new Button();
+        log.setGraphic(new ImageView(this.imageLog));
+
+        Button delete = new Button();
+        delete.setGraphic(new ImageView(this.imageDelete));
+
+        toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile,
+                resizeTerritory, ladybug, cherry, log, delete);
+
         return toolBar;
     }
 
-    private SplitPane addSplitPane(){
+    private SplitPane addSplitPane() throws FileNotFoundException {
         SplitPane splitPane = new SplitPane();
 
         TextArea leftControl = new TextArea();

@@ -13,6 +13,7 @@ public class Ladybug {
         this.fruitFuel = 0;
         this.xCoordinate = 0;
         this.yCoordinate = 0;
+        this.isAirborne = false;
     }
 
     public void printLadybug(){
@@ -75,6 +76,10 @@ public class Ladybug {
 
     }
 
+    public boolean isAirborne(){
+        return isAirborne;
+    }
+
     public void rightTurn(){
         this.direction = (this.direction+1)%4;
     }
@@ -91,5 +96,7 @@ public class Ladybug {
         return fruitFuel;
     }
 
-
+    public int getDirection() {
+        return direction;
+    }
 }
