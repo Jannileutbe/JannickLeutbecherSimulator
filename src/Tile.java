@@ -26,7 +26,7 @@ public class Tile {
       case 3: // Field with Leaf
         System.out.print("L");
         break;
-      case 4: // Field with Fruit under piece of Wood
+      case 4: // Field with Fruit under a Leaf
         System.out.print("S");
         break;
       default:
@@ -50,7 +50,10 @@ public class Tile {
     return state;
   }
 
-  public void setState(int state) {
-    this.state = state;
+  public void setState(int newState) {
+    if ((this.state == 2 && newState == 3) || (this.state == 3 && newState == 2)) {
+      newState = 4;
+    }
+    this.state = newState;
   }
 }

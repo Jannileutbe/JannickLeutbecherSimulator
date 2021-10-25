@@ -7,7 +7,6 @@ public class test {
       for (int j = 0; j < 4; j++) {
         System.out.print("O");
       }
-      System.out.println();
     }
   }
 

@@ -1,0 +1,13 @@
+public enum PossibleEvents {
+  NEWFILE,
+  OPENFILE,
+  SAFEFILE,
+  COMPILEFILE,
+  RESIZETERRITORY,
+  LADYBUG,
+  CHERRY,
+  LOG,
+  LEAF,
+  FRUITWITHLEAF,
+  DELETE
+}

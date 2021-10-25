@@ -11,7 +11,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -19,6 +18,8 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
+
 
 //Zur Hilfe wurden die Folien aus dem StudIP genommen
 
@@ -36,6 +37,8 @@ public class Main extends Application {
     private final Image imageDelete = new Image(new FileInputStream("./resources/Delete24.gif"));
 
     private Territory territory;
+
+    public CurrentEvent currentEvent = new CurrentEvent();
 
     public Main() throws FileNotFoundException {
     }
@@ -238,30 +241,84 @@ public class Main extends Application {
         ToolBar toolBar = new ToolBar();
 
         Button newFile = new Button();
+        newFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.NEWFILE);
+            }
+        });
         newFile.setGraphic(new ImageView(this.imageNew));
 
         Button openFile = new Button();
+        openFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.OPENFILE);
+            }
+        });
         openFile.setGraphic(new ImageView(this.imageOpen));
 
         Button safeFile = new Button();
+        safeFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.SAFEFILE);
+            }
+        });
         safeFile.setGraphic(new ImageView(this.imageSafe));
 
         Button compileFile = new Button();
+        compileFile.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
+            }
+        });
         compileFile.setGraphic(new ImageView(this.imageCompile));
 
         Button resizeTerritory = new Button();
+        resizeTerritory.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.RESIZETERRITORY);
+            }
+        });
         resizeTerritory.setGraphic(new ImageView(this.imageTerrain));
 
         Button ladybug = new Button();
+        ladybug.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.LADYBUG);
+            }
+        });
         ladybug.setGraphic(new ImageView(this.imageLadybugMoving));
 
         Button cherry = new Button();
+        cherry.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.CHERRY);
+            }
+        });
         cherry.setGraphic(new ImageView(this.imageCherry));
 
         Button log = new Button();
+        log.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.LOG);
+            }
+        });
         log.setGraphic(new ImageView(this.imageLog));
 
         Button delete = new Button();
+        delete.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                currentEvent.setCurrentEvent(PossibleEvents.DELETE);
+            }
+        });
         delete.setGraphic(new ImageView(this.imageDelete));
 
         toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile,
@@ -274,10 +331,14 @@ public class Main extends Application {
         SplitPane splitPane = new SplitPane();
 
         TextArea leftControl = new TextArea();
-        TerritoryPanel territoryPanel = new TerritoryPanel(this.territory);
+        TerritoryPanel territoryPanel = new TerritoryPanel(this.territory, currentEvent);
 
         splitPane.getItems().addAll(leftControl, territoryPanel);
 
         return splitPane;
+    }
+
+    public CurrentEvent getCurrentEvent() {
+        return currentEvent;
     }
 }
