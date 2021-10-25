@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 
 
 public class Main extends Application {
+    //TODO Buttons alle als Klassenvariable machen, um Modell-View-Controller umzusetzen
+    //TODO -> Buttons werden hier hinzugefügt und dargestellt (View) im Controller werden Events an die Buttons gehängt
 
     private final Image imageNew = new Image(new FileInputStream("./resources/New24.gif"));
     private final Image imageOpen = new Image(new FileInputStream("./resources/Open24.gif"));
@@ -36,9 +38,11 @@ public class Main extends Application {
     private final Image imageLog = new Image(new FileInputStream("./resources/LadybugAdventure/Log.png"));
     private final Image imageDelete = new Image(new FileInputStream("./resources/Delete24.gif"));
 
+
     private Territory territory;
 
-    public CurrentEvent currentEvent = new CurrentEvent();
+    private CurrentEvent currentEvent;
+
 
     public Main() throws FileNotFoundException {
     }
@@ -241,84 +245,39 @@ public class Main extends Application {
         ToolBar toolBar = new ToolBar();
 
         Button newFile = new Button();
-        newFile.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.NEWFILE);
-            }
-        });
+        newFile.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.NEWFILE));
         newFile.setGraphic(new ImageView(this.imageNew));
 
         Button openFile = new Button();
-        openFile.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.OPENFILE);
-            }
-        });
+        openFile.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.OPENFILE));
         openFile.setGraphic(new ImageView(this.imageOpen));
 
         Button safeFile = new Button();
-        safeFile.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.SAFEFILE);
-            }
-        });
+        safeFile.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.SAFEFILE));
         safeFile.setGraphic(new ImageView(this.imageSafe));
 
         Button compileFile = new Button();
-        compileFile.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
-            }
-        });
+        compileFile.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE));
         compileFile.setGraphic(new ImageView(this.imageCompile));
 
         Button resizeTerritory = new Button();
-        resizeTerritory.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.RESIZETERRITORY);
-            }
-        });
+        resizeTerritory.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.RESIZETERRITORY));
         resizeTerritory.setGraphic(new ImageView(this.imageTerrain));
 
         Button ladybug = new Button();
-        ladybug.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.LADYBUG);
-            }
-        });
+        ladybug.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.LADYBUG));
         ladybug.setGraphic(new ImageView(this.imageLadybugMoving));
 
         Button cherry = new Button();
-        cherry.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.CHERRY);
-            }
-        });
+        cherry.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.CHERRY));
         cherry.setGraphic(new ImageView(this.imageCherry));
 
         Button log = new Button();
-        log.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.LOG);
-            }
-        });
+        log.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.LOG));
         log.setGraphic(new ImageView(this.imageLog));
 
         Button delete = new Button();
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentEvent.setCurrentEvent(PossibleEvents.DELETE);
-            }
-        });
+        delete.setOnAction(event -> currentEvent.setCurrentEvent(PossibleEvents.DELETE));
         delete.setGraphic(new ImageView(this.imageDelete));
 
         toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile,
