@@ -1,3 +1,6 @@
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
 public class CurrentEvent {
 
   private PossibleEvents currentEvent;
@@ -9,5 +12,6 @@ public class CurrentEvent {
   public void setCurrentEvent(PossibleEvents possibleEvent){
     this.currentEvent = possibleEvent;
   }
+
 
 }
