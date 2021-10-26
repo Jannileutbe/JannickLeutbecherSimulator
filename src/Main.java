@@ -38,7 +38,7 @@ public class Main extends Application {
 
     private Territory territory;
 
-    public CurrentEvent currentEvent;
+    private CurrentEvent currentEvent = new CurrentEvent();
 
     public Main() throws FileNotFoundException {
     }
