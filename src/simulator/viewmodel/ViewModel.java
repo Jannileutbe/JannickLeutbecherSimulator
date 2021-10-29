@@ -1,15 +1,25 @@
 package simulator.viewmodel;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import simulator.model.CurrentEvent;
+import simulator.model.Ladybug;
 import simulator.model.Territory;
 import simulator.view.View;
 
@@ -25,7 +35,7 @@ public class ViewModel {
     View view = new View(territory, this, currentEvent, stage);
   }
 
-  public void handleEvent (MouseEvent me){
+  public void handleEvent(MouseEvent me) {
     int row = (int)(me.getY() / 34) - 1;
     int column = (int)(me.getX() / 34) - 1;
 
@@ -53,33 +63,46 @@ public class ViewModel {
       case TURNRIGHT:
         territory.getLadybug().rightTurn();
         break;
-
-      default:
-        System.err.println("No Button pressed!");
+        default:
+        break;
     }
   }
 
+
+  //Mit Martin Knab zusammengearbeitet
   public void safeEditor(TextArea textArea) {
     String editorContent = textArea.getText();
 
-    String prefix = "public class JannickLeutbecherSimulator extends Ladybug { \npublic ";
+    String prefix =
+        "import simulator.model.Ladybug;\n" +
+        "import simulator.model.Territory;\n" +
+        "\n" +
+        "public class JannickLeutbecherSimulator extends Ladybug {\n" +
+        "\n" +
+        "  public JannickLeutbecherSimulator(Territory territory) {\n" +
+        "    super(territory);\n" +
+        "  }\n" +
+        "\n" +
+        "  @Override\n" +
+        "  public ";
+    //String prefix = "public class JannickLeutbecherSimulator extends Ladybug { \npublic ";
     String postfix = "\n}";
     String savedContent = prefix + editorContent + postfix;
-    byte[] bytes = savedContent.getBytes(StandardCharsets.UTF_16);
+    byte[] bytes = savedContent.getBytes(StandardCharsets.UTF_8);
 
-    String savedContentUTF16 = new String(bytes, StandardCharsets.UTF_16);
+    String savedContentUTF8 = new String(bytes, StandardCharsets.UTF_8);
 
     try {
-      FileOutputStream fos = new FileOutputStream(new File("./resources/programme/JannickLeutbecherSimulator.java"));
-      ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-      oos.writeObject(savedContentUTF16);
-
+      File usedFile = new File("./resources/programme/JannickLeutbecherSimulator.java");
+      FileOutputStream fos = new FileOutputStream(usedFile);
+      byte[] contentAsBytes = savedContent.getBytes();
+      fos.write(contentAsBytes);
     } catch (FileNotFoundException e) {
       System.err.println("File not found!");
     } catch (IOException e) {
       System.err.println("Error");
     }
+  }
 
     /*
     String editorContent = textArea.getText();
@@ -90,18 +113,77 @@ public class ViewModel {
     sa
     vedContentAsFile.mkdirs();
      */
+
+  // Mit Dana Warmbold zusammengearbeitet
+  //https://stackoverflow.com/questions/40255039/how-to-choose-file-in-java/40255184#40255184
+  //https://stackoverflow.com/questions/13516829/jfilechooser-change-default-directory-in-windows
+  public String chooseFile() {
+    //C:\Benutzer\Jannick Leutbecher\IdeaProjects\JannickLeutbecherSimulator\resources\programme
+    JFileChooser chooser = new JFileChooser();
+    chooser.setCurrentDirectory(new File("./resources/programme"));
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+        "Java Files", "java");
+    chooser.setFileFilter(filter);
+    int returnVal = chooser.showOpenDialog(null);
+    String userProgramm = "";
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      File file = chooser.getSelectedFile();
+      try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+          userProgramm += line + "\n";
+        }
+      } catch (FileNotFoundException e) {
+        System.err.println("File not found!");
+      } catch (IOException e) {
+        System.err.println("Something went wrong!");
+      }
+    }
+    int userProgrammStart = userProgramm.indexOf("void main() {");
+    int userProgrammEnd = userProgramm.lastIndexOf("}");
+    userProgramm = userProgramm.substring(userProgrammStart, userProgrammEnd);
+    return userProgramm;
   }
 
-  public void openNewWindow(Stage stage) throws IOException {
-    ViewModel viewModel = new ViewModel(stage);
+  public String getUserPogrammForEditor() {
+    String userProgramm = "";
+    try (BufferedReader br = new BufferedReader(new FileReader("./resources/programme/JannickLeutbecherSimulator.java"))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        userProgramm += line + "\n";
+      }
+      int userProgrammStart = userProgramm.indexOf("void main() {");
+      int userProgrammEnd = userProgramm.lastIndexOf("}");
+      userProgramm = userProgramm.substring(userProgrammStart, userProgrammEnd);
+    } catch (FileNotFoundException e) {
+      userProgramm = "void main() {\n\n}";
+      System.err.println("File not found!");
+    } catch (IOException e) {
+      System.err.println("Something went wrong!");
+    }
+    return userProgramm;
+  }
 
+  public String getUserProgramm() {
+    String userProgramm = "";
+    try (BufferedReader br = new BufferedReader(new FileReader("./resources/programme/JannickLeutbecherSimulator.java"))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        userProgramm += line + "\n";
+      }
+    } catch (FileNotFoundException e) {
+      System.err.println("File not found!");
+    } catch (IOException e) {
+      System.err.println("Something went wrong!");
+    }
+    return userProgramm;
   }
 
   //https://stackabuse.com/java-check-if-string-is-a-number/
   public boolean isNumeric(String string) {
     int intValue;
 
-    if(string == null || string.equals("")) {
+    if (string == null || string.equals("")) {
       return false;
     }
 
@@ -111,5 +193,32 @@ public class ViewModel {
     } catch (NumberFormatException e) {
     }
     return false;
+  }
+
+
+  //TODO
+  public Class<?> compileUserProgramm() {
+    //String code = getUserProgramm();
+    File root = new File("./resources/programme");
+    File file = new File("./resources/programme/JannickLeutbecherSimulator.java");
+
+
+    JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+
+    javac.run(null, null, null, file.getPath());
+    Ladybug ladybug = null;
+    Class cls = null;
+    try {
+      URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{root.toURI().toURL()});
+      cls = Class.forName("JannickLeutbecherSimulator", true, classLoader);
+    } catch (MalformedURLException e) {
+      System.err.println("MalformedURLException");
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      System.err.println("ClassNotFoundException");
+      e.printStackTrace();
+    }
+
+    return cls;
   }
 }

@@ -73,6 +73,10 @@ public class Territory {
     return ladybug;
   }
 
+  public void setLadybug(Ladybug ladybug) {
+    this.ladybug = ladybug;
+  }
+
   public int getRows() {
     return rows;
   }

@@ -2,6 +2,8 @@ package simulator.view;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -21,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import simulator.model.CurrentEvent;
+import simulator.model.Ladybug;
 import simulator.model.enums.PossibleEvents;
 import simulator.model.Territory;
 
@@ -51,6 +54,9 @@ public class View extends Application {
   private final Image imageMoveForward = new Image(new FileInputStream("./resources/LadybugAdventure/MoveForwardLadybug.png"));
   private final Image imageEatFruit = new Image(new FileInputStream("./resources/LadybugAdventure/LadybugEatFruit.png"));
   private final Image imagePullLeaf = new Image(new FileInputStream("./resources/LadybugAdventure/PullLeaf.png"));
+  private final Image imagePlay = new Image(new FileInputStream("./resources/Play24.gif"));
+  private final Image imagePause = new Image(new FileInputStream("./resources/Pause24.gif"));
+  private final Image imageStop = new Image(new FileInputStream("./resources/Stop24.gif"));
 
   private final Territory territory;
   private final ViewModel viewModel;
@@ -269,24 +275,26 @@ public class View extends Application {
     ToolBar toolBar = new ToolBar();
 
     Button newFile = new Button();
+    newFile.setGraphic(new ImageView(this.imageNew));
     newFile.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.NEWFILE);
       }
     });
-    newFile.setGraphic(new ImageView(this.imageNew));
 
     Button openFile = new Button();
+    openFile.setGraphic(new ImageView(this.imageOpen));
     openFile.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-        currentEvent.setCurrentEvent(PossibleEvents.OPENFILE);
+        String userProgramm = viewModel.chooseFile();
+        editor.setText(userProgramm);
       }
     });
-    openFile.setGraphic(new ImageView(this.imageOpen));
 
     Button safeFile = new Button();
+    safeFile.setGraphic(new ImageView(this.imageSafe));
     safeFile.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -295,82 +303,84 @@ public class View extends Application {
         System.out.println(editor.getText());
       }
     });
-    safeFile.setGraphic(new ImageView(this.imageSafe));
 
     Button compileFile = new Button();
+    compileFile.setGraphic(new ImageView(this.imageCompile));
     compileFile.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
+        viewModel.safeEditor(editor);
         currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
+        //TODO Kompilieren
       }
     });
-    compileFile.setGraphic(new ImageView(this.imageCompile));
 
     Button resizeTerritory = new Button();
+    resizeTerritory.setGraphic(new ImageView(this.imageTerrain));
     resizeTerritory.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         buildResizeWindow();
       }
     });
-    resizeTerritory.setGraphic(new ImageView(this.imageTerrain));
 
     Button ladybug = new Button();
+    ladybug.setGraphic(new ImageView(this.gifLadybugMoving));
     ladybug.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.LADYBUG);
       }
     });
-    ladybug.setGraphic(new ImageView(this.gifLadybugMoving));
 
     Button flayingLadybug = new Button();
+    flayingLadybug.setGraphic(new ImageView(this.gifLadybugFlying));
     flayingLadybug.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.FLYINGLADYBUG);
       }
     });
-    flayingLadybug.setGraphic(new ImageView(this.gifLadybugFlying));
 
     Button cherry = new Button();
+    cherry.setGraphic(new ImageView(this.imageCherry));
     cherry.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.CHERRY);
       }
     });
-    cherry.setGraphic(new ImageView(this.imageCherry));
 
     Button log = new Button();
+    log.setGraphic(new ImageView(this.imageLog));
     log.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.LOG);
       }
     });
-    log.setGraphic(new ImageView(this.imageLog));
 
     Button leaf = new Button();
+    leaf.setGraphic(new ImageView(this.imageLeaf));
     leaf.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.LEAF);
       }
     });
-    leaf.setGraphic(new ImageView(this.imageLeaf));
 
     Button delete = new Button();
+    delete.setGraphic(new ImageView(this.imageDelete));
+    delete.setMinSize(40, 40);
     delete.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.DELETE);
       }
     });
-    delete.setGraphic(new ImageView(this.imageDelete));
-    delete.setMinSize(40, 40);
 
     Button turnRight = new Button();
+    turnRight.setGraphic(new ImageView(this.imageTurnRight));
     turnRight.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -378,9 +388,9 @@ public class View extends Application {
         territoryPanel.buildPlayingField(territory);
       }
     });
-    turnRight.setGraphic(new ImageView(this.imageTurnRight));
 
     Button moveForward = new Button();
+    moveForward.setGraphic(new ImageView(this.imageMoveForward));
     moveForward.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -388,9 +398,9 @@ public class View extends Application {
         territoryPanel.buildPlayingField(territory);
       }
     });
-    moveForward.setGraphic(new ImageView(this.imageMoveForward));
 
     Button eatFruit = new Button();
+    eatFruit.setGraphic(new ImageView(this.imageEatFruit));
     eatFruit.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -398,9 +408,9 @@ public class View extends Application {
         territoryPanel.buildPlayingField(territory);
       }
     });
-    eatFruit.setGraphic(new ImageView(this.imageEatFruit));
 
     Button pullLeaf = new Button();
+    pullLeaf.setGraphic(new ImageView(this.imagePullLeaf));
     pullLeaf.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -408,7 +418,6 @@ public class View extends Application {
         territoryPanel.buildPlayingField(territory);
       }
     });
-    pullLeaf.setGraphic(new ImageView(this.imagePullLeaf));
 
     Label fruitFuelLabel = new Label("FruitFuel: ");
     fruitFuelLabel.minHeight(40);
@@ -418,12 +427,29 @@ public class View extends Application {
     Button fruitFuel = new Button("FruitFuel: ");
     fruitFuel.textProperty().bind(territory.getLadybug().getFruitFuel().valueProperty().asString());
 
+    Label spacing = new Label("     ");
+
+    Button start = new Button();
+    start.setGraphic(new ImageView(this.imagePlay));
+    start.setMinSize(40, 40);
+
+    Button pause = new Button();
+    pause.setGraphic(new ImageView(this.imagePause));
+    pause.setMinSize(40, 40);
+
+    Button stop = new Button();
+    stop.setGraphic(new ImageView(this.imageStop));
+    stop.setMinSize(40, 40);
+
+
     toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile, resizeTerritory, ladybug, flayingLadybug, cherry,
-        leaf, log, delete, turnRight, moveForward, eatFruit, pullLeaf, fruitFuelLabel, fruitFuel);
+        leaf, log, delete, turnRight, moveForward, eatFruit, pullLeaf, fruitFuelLabel, fruitFuel, spacing, start, pause, stop);
 
     return toolBar;
   }
 
+
+  //Mit Dana Warmbold zusammengearbeitet
   private void buildResizeWindow() {
     Stage primaryStage = new Stage();
 
@@ -452,6 +478,27 @@ public class View extends Application {
 
     Button ok = new Button("OK");
     ok.setMinWidth(50);
+    ok.setDisable(true);
+    newRowsTextField.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        if (viewModel.isNumeric(newRowsTextField.getText()) && viewModel.isNumeric(newColumnsTextField.getText())) {
+          ok.setDisable(false);
+        } else {
+          ok.setDisable(true);
+        }
+      }
+    });
+    newColumnsTextField.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        if (viewModel.isNumeric(newColumnsTextField.getText()) && viewModel.isNumeric(newRowsTextField.getText())) {
+          ok.setDisable(false);
+        } else {
+          ok.setDisable(true);
+        }
+      }
+    });
     ok.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -490,7 +537,7 @@ public class View extends Application {
 
   private SplitPane addSplitPane() throws FileNotFoundException {
     SplitPane splitPane = new SplitPane();
-    TextArea editor = new TextArea("void main() { \n \n}");
+    TextArea editor = new TextArea(viewModel.getUserPogrammForEditor());
     this.editor = editor;
     TerritoryPanel territoryPanel = new TerritoryPanel(this.territory, viewModel);
     this.territoryPanel = territoryPanel;
@@ -501,6 +548,6 @@ public class View extends Application {
   }
 
   public TextArea getEditor() {
-        return this.editor;
+    return this.editor;
   }
 }

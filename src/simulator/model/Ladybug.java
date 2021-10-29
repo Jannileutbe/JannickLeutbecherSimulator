@@ -9,17 +9,25 @@ public class Ladybug {
 
   private final Territory territory;
   private int direction;
-  private FruitFuel fruitFuel;
   private int row;
   private int column;
   private boolean isAirborne;
+  private FruitFuel fruitFuel;
 
-  public void rightTurn() {
-    this.direction = (this.direction + 1) % 4;
+  public void main() {
+
+  }
+
+  public int getDirection() {
+    return direction;
   }
 
   public boolean isAirborne() {
     return isAirborne;
+  }
+
+  public FruitFuel getFruitFuel() {
+    return fruitFuel;
   }
 
   public int getRow() {
@@ -28,56 +36,6 @@ public class Ladybug {
 
   public int getColumn() {
     return column;
-  }
-
-  public FruitFuel getFruitFuel() {
-    return fruitFuel;
-  }
-
-  public int getDirection() {
-    return direction;
-  }
-
-
-  public void main() {
-
-  }
-
-  public void setCoordinates(int newRow, int newColumn) {
-    if (
-        (newRow < 0 || newRow > territory.getRows()) ||
-            newColumn < 0 || newColumn > territory.getColumns()
-    ) {
-      throw new RanOutsideFieldException();
-    }
-    if (
-        (this.territory.getPlayingField()[newRow][newColumn].getState() == 1) ||
-            this.territory.getPlayingField()[newRow][newColumn].getState() == 1
-    ) {
-      throw new RanAgainstWallException();
-    }
-    this.row = newRow;
-    this.column = newColumn;
-  }
-
-  public void setRow(int newRow) {
-    if (newRow < 0 || newRow > territory.getRows()) {
-      throw new RanOutsideFieldException();
-    }
-    if (this.territory.getPlayingField()[newRow][this.column].getState() == 1) {
-      throw new RanAgainstWallException();
-    }
-    this.row = newRow;
-  }
-
-  public void setColumn(int newColumn) {
-    if (newColumn < 0 || newColumn > territory.getColumns()) {
-      throw new RanOutsideFieldException();
-    }
-    if (this.territory.getPlayingField()[this.row][newColumn].getState() == 1) {
-      throw new RanAgainstWallException();
-    }
-    this.column = newColumn;
   }
 
   public Ladybug(Territory territory) {
@@ -119,34 +77,8 @@ public class Ladybug {
     this.column = newColumn;
   }
 
-  public void moveBackward() {
-    int newRow = this.getRow();
-    int newColumn = this.getColumn();
-    switch (direction) {
-      case 0:
-        newRow++;
-        break;
-      case 1:
-        newColumn--;
-        break;
-      case 2:
-        newRow--;
-        break;
-      case 3:
-        newColumn++;
-        break;
-      default:
-        System.err.println("X");
-    }
-    if (newRow < 0 || newRow > territory.getRows() ||
-        newColumn < 0 || newColumn > territory.getColumns()) {
-      throw new RanOutsideFieldException();
-    }
-    if (this.territory.getPlayingField()[newRow][newColumn].getState() == 1) {
-      throw new RanAgainstWallException();
-    }
-    this.row = newRow;
-    this.column = newColumn;
+  public void rightTurn() {
+    this.direction = (this.direction + 1) % 4;
   }
 
   public void eatFruit() {
@@ -177,7 +109,7 @@ public class Ladybug {
     }
   }
 
-  public Tile getTileInfrontOfYou() {
+  private Tile getTileInfrontOfYou() {
     Tile frontTile;
     switch (this.direction) {
       case 0:
@@ -198,7 +130,56 @@ public class Ladybug {
     return frontTile;
   }
 
-  public Tile getTileBehindYou() {
+
+
+  public void setCoordinates(int newRow, int newColumn) {
+    if (
+        (newRow < 0 || newRow > territory.getRows()) ||
+            newColumn < 0 || newColumn > territory.getColumns()
+    ) {
+      throw new RanOutsideFieldException();
+    }
+    if (
+        (this.territory.getPlayingField()[newRow][newColumn].getState() == 1) ||
+            this.territory.getPlayingField()[newRow][newColumn].getState() == 1
+    ) {
+      throw new RanAgainstWallException();
+    }
+    this.row = newRow;
+    this.column = newColumn;
+  }
+
+  private void moveBackward() {
+    int newRow = this.getRow();
+    int newColumn = this.getColumn();
+    switch (direction) {
+      case 0:
+        newRow++;
+        break;
+      case 1:
+        newColumn--;
+        break;
+      case 2:
+        newRow--;
+        break;
+      case 3:
+        newColumn++;
+        break;
+      default:
+        System.err.println("X");
+    }
+    if (newRow < 0 || newRow > territory.getRows() ||
+        newColumn < 0 || newColumn > territory.getColumns()) {
+      throw new RanOutsideFieldException();
+    }
+    if (this.territory.getPlayingField()[newRow][newColumn].getState() == 1) {
+      throw new RanAgainstWallException();
+    }
+    this.row = newRow;
+    this.column = newColumn;
+  }
+
+  private Tile getTileBehindYou() {
     Tile backTile;
     switch (this.direction) {
       case 0:
