@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import simulator.view.View;
+import simulator.viewmodel.ViewModel;
 
 public class Main extends Application {
 

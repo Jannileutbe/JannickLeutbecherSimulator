@@ -53,7 +53,7 @@ public class Territory {
         }
       }
     }
-    if (newRows >= ladybug.getRow() || newColumns >= ladybug.getColumn()) {
+    if (newRows <= ladybug.getRow() || newColumns <= ladybug.getColumn()) {
       ladybug.setCoordinates(0, 0);
     }
     this.playingField = newPlayingfield;
