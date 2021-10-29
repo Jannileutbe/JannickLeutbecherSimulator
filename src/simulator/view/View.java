@@ -21,13 +21,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import simulator.model.CurrentEvent;
-import simulator.model.PossibleEvents;
+import simulator.model.enums.PossibleEvents;
 import simulator.model.Territory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import simulator.viewmodel.ViewModel;
 
@@ -53,20 +52,23 @@ public class View extends Application {
   private final Image imageEatFruit = new Image(new FileInputStream("./resources/LadybugAdventure/LadybugEatFruit.png"));
   private final Image imagePullLeaf = new Image(new FileInputStream("./resources/LadybugAdventure/PullLeaf.png"));
 
-  private Territory territory;
-  private TerritoryPanel territoryPanel;
-  private ViewModel viewModel;
+  private final Territory territory;
+  private final ViewModel viewModel;
+  private final CurrentEvent currentEvent;
 
-  private final CurrentEvent currentEvent = new CurrentEvent();
+  private TerritoryPanel territoryPanel;
   private TextArea editor;
 
-  public View() throws FileNotFoundException {
+  public View(Territory territory, ViewModel viewModel, CurrentEvent currentEvent, Stage stage) throws FileNotFoundException {
+    this.viewModel = viewModel;
+    this.territory = territory;
+    this.currentEvent = currentEvent;
+    this.editor = this.getEditor();
+    this.start(stage);
   }
 
   @Override
   public void start(Stage primaryStage) throws FileNotFoundException {
-    this.territory = new Territory();
-    this.viewModel = new ViewModel(territory, currentEvent);
     VBox gameWindow = createGameWindow();
     StackPane root = new StackPane();
     root.getChildren().add(gameWindow);
@@ -76,7 +78,6 @@ public class View extends Application {
     primaryStage.setTitle("Ladybug Adventure!");
     primaryStage.setScene(scene);
     primaryStage.show();
-    this.editor = this.getEditor();
   }
 
   private VBox createGameWindow() throws FileNotFoundException {
@@ -119,7 +120,8 @@ public class View extends Application {
       @Override
       public void handle(ActionEvent event) {
         try {
-          viewModel.openNewWindow();
+          Stage stage = new Stage();
+          ViewModel viewModel = new ViewModel(stage);
         } catch (IOException e) {
           System.err.println("Couldn't open new gamewindow");
         }

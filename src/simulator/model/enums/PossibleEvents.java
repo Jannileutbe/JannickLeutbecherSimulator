@@ -1,19 +1,15 @@
-package simulator.model;
+package simulator.model.enums;
 
 public enum PossibleEvents {
   NEWFILE,
   OPENFILE,
   SAFEFILE,
   COMPILEFILE,
-  RESIZETERRITORY,
   LADYBUG,
   FLYINGLADYBUG,
   CHERRY,
   LOG,
   LEAF,
-  FRUITWITHLEAF,
   DELETE,
   TURNRIGHT,
-  MOVEFORWARD,
-  EATFRUIT
 }

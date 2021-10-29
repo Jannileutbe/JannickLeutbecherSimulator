@@ -1,4 +1,4 @@
-package simulator.model;
+package simulator.model.exceptions;
 
 public class RanOutsideFieldException extends RuntimeException {
   public RanOutsideFieldException() {

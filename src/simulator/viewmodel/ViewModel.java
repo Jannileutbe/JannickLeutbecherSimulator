@@ -16,12 +16,13 @@ import simulator.view.View;
 public class ViewModel {
 
 
-  private Territory territory;
-  private CurrentEvent currentEvent;
+  private final Territory territory;
+  private final CurrentEvent currentEvent;
 
-  public ViewModel(Territory territory, CurrentEvent currentEvent){
-    this.territory = territory;
-    this.currentEvent = currentEvent;
+  public ViewModel(Stage stage) throws FileNotFoundException {
+    this.territory = new Territory();
+    this.currentEvent = new CurrentEvent();
+    View view = new View(territory, this, currentEvent, stage);
   }
 
   public void handleEvent (MouseEvent me){
@@ -91,12 +92,9 @@ public class ViewModel {
      */
   }
 
+  public void openNewWindow(Stage stage) throws IOException {
+    ViewModel viewModel = new ViewModel(stage);
 
-  public void openNewWindow() throws IOException {
-    View view = new View();
-    Stage stage = new Stage();
-
-    view.start(stage);
   }
 
   //https://stackabuse.com/java-check-if-string-is-a-number/

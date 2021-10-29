@@ -1,5 +1,10 @@
 package simulator.model;
 
+import simulator.model.exceptions.NoFruitOnThisTileException;
+import simulator.model.exceptions.NoLeafInfrontOfYouException;
+import simulator.model.exceptions.RanAgainstWallException;
+import simulator.model.exceptions.RanOutsideFieldException;
+
 public class Ladybug {
 
   private final Territory territory;

@@ -1,5 +1,7 @@
 package simulator.model;
 
+import simulator.model.enums.PossibleEvents;
+
 public class CurrentEvent {
 
   private PossibleEvents currentEvent;
