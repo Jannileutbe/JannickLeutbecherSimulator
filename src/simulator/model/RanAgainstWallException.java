@@ -1,3 +1,5 @@
+package simulator.model;
+
 public class RanAgainstWallException extends RuntimeException{
 
   public RanAgainstWallException(){

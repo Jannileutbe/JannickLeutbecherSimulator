@@ -1,3 +1,6 @@
+package simulator.view;
+
+import simulator.viewmodel.ViewModel;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -5,6 +8,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import simulator.model.CurrentEvent;
+import simulator.model.Territory;
+import simulator.model.Tile;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,9 +18,9 @@ import java.io.FileNotFoundException;
 
 public class TerritoryPanel extends Region {
 
-  private final Territory territory;
-  private final GraphicsContext gc;
-  private CurrentEvent currentEvent;
+  private Territory territory;
+  private final ViewModel viewModel;
+  private GraphicsContext gc;
 
 
   private final Image imageLog = new Image(new FileInputStream("./resources/LadybugAdventure/Log.png"));
@@ -22,61 +28,42 @@ public class TerritoryPanel extends Region {
   private final Image imageLeaf = new Image(new FileInputStream("./resources/LadybugAdventure/Leaf.png"));
   private final Image imageFruitUnderLeaf = new Image(new FileInputStream("./resources/LadybugAdventure/LeafWithFruit.png"));
   private final Image imageLadybug = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug.png"));
+  private final Image imageLadybug90Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug90Degree.png"));
+  private final Image imageLadybug180Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug180Degree.png"));
+  private final Image imageLadybug270Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug270Degree.png"));
   private final Image imageFlyingLadybug = new Image(new FileInputStream("./resources/LadybugAdventure/flyingLadybug.png"));
 
-  public TerritoryPanel(Territory territory, CurrentEvent currentEvent) throws FileNotFoundException {
+  public TerritoryPanel(Territory territory, ViewModel viewModel) throws FileNotFoundException {
     this.territory = territory;
+    this.viewModel = viewModel;
+    buildPlayingField(territory);
+  }
+
+  // Mit Dana Warmbold zusammengearbeitet
+  public void buildPlayingField(Territory territory) {
+    this.territory = territory;
+    this.getChildren().clear();
     Canvas canvas = new Canvas();
     canvas.setWidth((territory.getColumns() + 2) * 34);
     canvas.setHeight((territory.getRows() + 2) * 34);
     this.gc = canvas.getGraphicsContext2D();
-    buildPlayingField();
-    this.getChildren().addAll(canvas);
+    this.getChildren().add(canvas);
     this.setVisible(true);
-    this.currentEvent = currentEvent;
-
-
     canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
       @Override
       public void handle(MouseEvent me) {
-        int row = (int)(me.getY() / 34) - 1;
-        int column = (int)(me.getX() / 34) - 1;
-
-        switch (currentEvent.getCurrentEvent()) {
-          case LADYBUG:
-            territory.getLadybug().setCoordinates(row, column);
-            System.out.println(territory.getLadybug().getRow() + "" + territory.getLadybug().getColumn());
-            break;
-          case LOG:
-            territory.getPlayingField()[row][column].setState(1);
-            System.out.println("Log Updated[" + row + "][" + column + "]");
-            break;
-          case CHERRY:
-            territory.getPlayingField()[row][column].setState(2);
-            System.out.println("Cherry Updated[" + row + "][" + column + "]");
-            break;
-          case LEAF:
-            territory.getPlayingField()[row][column].setState(3);
-            System.out.println("LeafUpdated[" + row + "][" + column + "]");
-            break;
-          case DELETE:
-            territory.getPlayingField()[row][column].setState(0);
-            System.out.println("Tile cleared [" + row + "][" + column + "]");
-            break;
-          default:
-            System.err.println("No Button pressed!");
-        }
+        viewModel.handleEvent(me);
+        buildPlayingField(territory);
       }
     });
-  }
 
-  // Mit Dana Warmbold zusammengearbeitet
-  private void buildPlayingField() {
+
+
     int xCoordinate;
     int yCoordinate = 34;
 
     gc.setFill(Color.WHITE);
-    gc.fillRect(0, 0, ((territory.getColumns() + 2) * 34), ((territory.getColumns() + 2) * 34));
+    gc.fillRect(0, 0, ((territory.getColumns() + 2) * 34), ((territory.getRows() + 2) * 34));
 
     for (int i = 0; i < territory.getPlayingField().length; i++) {
       xCoordinate = 34;
@@ -86,6 +73,7 @@ public class TerritoryPanel extends Region {
       }
       yCoordinate += 34;
     }
+    printLadybug();
   }
 
   // Mit Dana Warmbold zusammengearbeitet
@@ -98,6 +86,7 @@ public class TerritoryPanel extends Region {
 
     switch (tile.getState()) {
       case 0:
+        gc.fillRect(xCoordinate, yCoordinate, 34, 34);
         break;
       case 1:
         gc.drawImage(this.imageLog, xCoordinate, yCoordinate);
@@ -114,12 +103,26 @@ public class TerritoryPanel extends Region {
       default:
         System.err.println("FAIL");
     }
+  }
 
+  public void printLadybug() {
     int xCoordinateLadybug = 34 + ((territory.getLadybug().getColumn() * 34) + 1);
     int yCoordinateLadybug = 34 + ((territory.getLadybug().getRow() * 34) + 1);
 
     if (!territory.getLadybug().isAirborne()) {
-      gc.drawImage(this.imageLadybug, xCoordinateLadybug, yCoordinateLadybug);
+      switch (territory.getLadybug().getDirection()) {
+        case 0:
+          gc.drawImage(this.imageLadybug, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 1:
+          gc.drawImage(this.imageLadybug90Degree, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 2:
+          gc.drawImage(this.imageLadybug180Degree, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 3:
+          gc.drawImage(this.imageLadybug270Degree, xCoordinateLadybug, yCoordinateLadybug);
+      }
     } else {
       gc.drawImage(this.imageFlyingLadybug, xCoordinateLadybug, yCoordinateLadybug);
     }

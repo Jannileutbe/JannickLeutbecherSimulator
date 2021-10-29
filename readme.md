@@ -1,4 +1,4 @@
-Das Ladybug-Adventure
+Das simulator.model.Ladybug-Adventure
 
 1. Die Landschaft
 

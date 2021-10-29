@@ -1,3 +1,5 @@
+package simulator.model;
+
 public class Territory {
 
 
@@ -40,32 +42,23 @@ public class Territory {
     this.ladybug = new Ladybug(this);
   }
 
-  public void printPlayingField() {
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < columns; j++) {
-        if (i == ladybug.getRow() && j == ladybug.getColumn()) {
-          ladybug.printLadybug();
-        } else {
-          playingField[i][j].printTile();
-        }
-      }
-      System.out.println();
-    }
-  }
-
   public void resizeTerritory(Territory this, int newRows, int newColumns) {
     Tile[][] newPlayingfield = new Tile[newRows][newColumns];
     for (int i = 0; i < newRows; i++) {
       for (int j = 0; j < newColumns; j++) {
-        newPlayingfield[i][j] = playingField[i][j];
+        if (i < this.getRows() && j < this.getColumns()) {
+          newPlayingfield[i][j] = playingField[i][j];
+        } else {
+          newPlayingfield[i][j] = new Tile();
+        }
       }
     }
-    this.rows = newRows;
-    this.columns = newColumns;
-    if (this.rows >= ladybug.getRow() || this.columns >= ladybug.getColumn()) {
-      ladybug.setCoordinates(0,0);
+    if (newRows >= ladybug.getRow() || newColumns >= ladybug.getColumn()) {
+      ladybug.setCoordinates(0, 0);
     }
     this.playingField = newPlayingfield;
+    this.rows = newRows;
+    this.columns = newColumns;
   }
 
   public void placeWood(int row, int column) {

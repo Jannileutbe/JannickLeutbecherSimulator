@@ -1,5 +1,4 @@
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+package simulator.model;
 
 public class CurrentEvent {
 
