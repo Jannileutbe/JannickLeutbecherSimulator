@@ -2,12 +2,10 @@ package simulator.model;
 
 public class Territory {
 
-
   private Tile[][] playingField;
   private Ladybug ladybug;
   private int rows;
   private int columns;
-
 
   public Territory(int rows, int columns) {
     this.playingField = new Tile[rows][columns];
@@ -40,6 +38,41 @@ public class Territory {
     this.playingField[2][1].setState(1);
 
     this.ladybug = new Ladybug(this);
+  }
+
+  public Territory(int rows, int columns, Ladybug ladybug) {
+    this.playingField = new Tile[rows][columns];
+    this.rows = rows;
+    this.columns = columns;
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < columns; j++) {
+        playingField[i][j] = new Tile();
+      }
+    }
+    this.ladybug = ladybug;
+    ladybug.setTerritory(this);
+  }
+
+  public Territory(Ladybug ladybug) {
+    int rows = 5;
+    int columns = 5;
+    this.rows = rows;
+    this.columns = columns;
+    this.playingField = new Tile[rows][columns];
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < columns; j++) {
+        playingField[i][j] = new Tile();
+      }
+    }
+
+    this.playingField[1][1].setState(1);
+    this.playingField[3][2].setState(1);
+    this.playingField[2][4].setState(1);
+    this.playingField[4][4].setState(1);
+    this.playingField[2][1].setState(1);
+
+    this.ladybug = ladybug;
+    ladybug.setTerritory(this);
   }
 
   public void resizeTerritory(Territory this, int newRows, int newColumns) {

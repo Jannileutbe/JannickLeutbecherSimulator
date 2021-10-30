@@ -311,7 +311,9 @@ public class View extends Application {
       public void handle(ActionEvent event) {
         viewModel.safeEditor(editor);
         currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
-        //TODO Kompilieren
+        Ladybug userLadybug = viewModel.compileUserProgramm();
+        territory.setLadybug(userLadybug);
+        territoryPanel.buildPlayingField(territory);
       }
     });
 
@@ -432,6 +434,13 @@ public class View extends Application {
     Button start = new Button();
     start.setGraphic(new ImageView(this.imagePlay));
     start.setMinSize(40, 40);
+    start.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        territory.getLadybug().main();
+        territoryPanel.buildPlayingField(territory);
+      }
+    });
 
     Button pause = new Button();
     pause.setGraphic(new ImageView(this.imagePause));
@@ -453,11 +462,13 @@ public class View extends Application {
   private void buildResizeWindow() {
     Stage primaryStage = new Stage();
 
+    Label notification = new Label("Gib die neuen Reihen und Zeilen ein!");
+
     HBox hBoxRows = new HBox();
     hBoxRows.setAlignment(Pos.CENTER);
 
     Label newRowsLabel = new Label("    New Rows: ");
-    TextField newRowsTextField = new TextField();
+    TextField newRowsTextField = new TextField("");
     newRowsTextField.setMaxWidth(100);
 
     hBoxRows.getChildren().addAll(newRowsLabel, newRowsTextField);
@@ -467,7 +478,7 @@ public class View extends Application {
     hBoxColumns.setAlignment(Pos.CENTER);
 
     Label newColumnLabel = new Label("New Columns: ");
-    TextField newColumnsTextField = new TextField();
+    TextField newColumnsTextField = new TextField("");
     newColumnsTextField.setMaxWidth(100);
 
     hBoxColumns.getChildren().addAll(newColumnLabel, newColumnsTextField);
@@ -479,26 +490,8 @@ public class View extends Application {
     Button ok = new Button("OK");
     ok.setMinWidth(50);
     ok.setDisable(true);
-    newRowsTextField.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        if (viewModel.isNumeric(newRowsTextField.getText()) && viewModel.isNumeric(newColumnsTextField.getText())) {
-          ok.setDisable(false);
-        } else {
-          ok.setDisable(true);
-        }
-      }
-    });
-    newColumnsTextField.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        if (viewModel.isNumeric(newColumnsTextField.getText()) && viewModel.isNumeric(newRowsTextField.getText())) {
-          ok.setDisable(false);
-        } else {
-          ok.setDisable(true);
-        }
-      }
-    });
+    setButtonListener(notification, newRowsTextField, newColumnsTextField, ok);
+    setButtonListener(notification, newColumnsTextField, newRowsTextField, ok);
     ok.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
@@ -526,13 +519,35 @@ public class View extends Application {
 
     VBox root = new VBox(10);
     root.setPadding(new Insets(20, 20, 20, 20));
-    root.getChildren().addAll(hBoxRows, hBoxColumns, hBoxButtons);
+    root.getChildren().addAll(notification, hBoxRows, hBoxColumns, hBoxButtons);
     Scene scene = new Scene(root);
     primaryStage.setResizable(false);
     primaryStage.setTitle("Resize");
     primaryStage.setScene(scene);
     primaryStage.show();
 
+  }
+
+  private void setButtonListener(Label notification, TextField newRowsTextField, TextField newColumnsTextField, Button ok) {
+    newRowsTextField.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        if (viewModel.isNumeric(newRowsTextField.getText()) && viewModel.isNumeric(newColumnsTextField.getText())) {
+          if (Integer.parseInt(newRowsTextField.getText()) < 1 || Integer.parseInt(newColumnsTextField.getText()) < 1) {
+            notification.setText("Keine Nullen oder negative Zahlen!");
+            ok.setDisable(true);
+          } else {
+            notification.setText("Gib die neuen Reihen und Zeilen ein!");
+            ok.setDisable(false);
+          }
+        } else {
+          if (!newColumnsTextField.getText().equals("")) {
+            notification.setText("Keine Buchstaben, nur Zahlen!");
+          }
+          ok.setDisable(true);
+        }
+      }
+    });
   }
 
   private SplitPane addSplitPane() throws FileNotFoundException {
