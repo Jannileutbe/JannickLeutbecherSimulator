@@ -1,18 +1,14 @@
+package simulator.model;
+
 public class Tile {
-  private boolean isLadybugThere;
+
   private int state;
 
   public Tile() {
-    this.isLadybugThere = false;
     this.state = 0;
   }
 
-  public Tile (boolean isLadybugThere){
-    this.isLadybugThere = isLadybugThere;
-    this.state = 0;
-  }
-
-  public void printTile(){
+  public void printTile() {
     switch (state) {
       case 0: // Free Field
         System.out.print("O");
@@ -32,18 +28,6 @@ public class Tile {
       default:
         System.err.print("X");
     }
-  }
-
-  public boolean isFruitThere(){
-    return state == 2;
-  }
-
-  public boolean isLadybugThere() {
-    return isLadybugThere;
-  }
-
-  public void setLadybugThere(boolean ladybugThere) {
-    isLadybugThere = ladybugThere;
   }
 
   public int getState() {

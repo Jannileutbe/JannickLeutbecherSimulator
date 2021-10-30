@@ -1,5 +1,6 @@
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+package simulator.model;
+
+import simulator.model.enums.PossibleEvents;
 
 public class CurrentEvent {
 
