@@ -31,47 +31,6 @@ public class Ladybug {
     public void main() {
     }
 
-    public int getDirection() {
-        return direction;
-    }
-
-    public void setDirection(int newDirection) {
-        this.direction = newDirection;
-    }
-
-    public boolean isAirborne() {
-        return isAirborne;
-    }
-
-    public void setAirborne(boolean airborne) {
-        if (this.fruitFuel.getFruitFuelAsInt() == 0) {
-            throw new NotEnoughFuelToFlyException();
-        } else {
-            isAirborne = airborne;
-        }
-    }
-
-    public FruitFuel getFruitFuel() {
-        return fruitFuel;
-    }
-
-    public void setFruitFuel(int newFruitFuel) {
-        fruitFuel.setFruitFuel(newFruitFuel);
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public int getColumn() {
-        return column;
-    }
-
-    public void setTerritory(Territory territory) {
-        this.territory = territory;
-
-    }
-
     public void moveForward() throws RanOutsideFieldException, RanAgainstWallException, LandedOnLogException {
         int newRow = this.getRow();
         int newColumn = this.getColumn();
@@ -97,7 +56,7 @@ public class Ladybug {
                 this.row = newRow;
                 this.column = newColumn;
             } else {
-                this.setAirborne(false);
+                this.changeIsAirborne();
                 this.fruitFuel.setFruitFuel((this.fruitFuel.getFruitFuelAsInt() - 1));
                 this.row = newRow;
                 this.column = newColumn;
@@ -127,31 +86,54 @@ public class Ladybug {
         this.direction = (this.direction + 1) % 4;
     }
 
-    public void eatFruit() {
-        Tile currentTile = this.territory.getPlayingField()[this.row][this.column];
-        if (currentTile.getState() == 2) {
-            currentTile.setState(0);
-            this.fruitFuel.setFruitFuel((this.getFruitFuel().getFruitFuelAsInt() + 3));
+    public void eatFruit() throws NoFruitOnThisTileException, CantDoThisWhileAirborneException {
+        if (!this.isAirborne) {
+            Tile currentTile = this.territory.getPlayingField()[this.row][this.column];
+            if (currentTile.getState() == 2) {
+                currentTile.setState(0);
+                this.fruitFuel.setFruitFuel((this.getFruitFuel().getFruitFuelAsInt() + 3));
+            } else {
+                throw new NoFruitOnThisTileException();
+            }
         } else {
-            throw new NoFruitOnThisTileException();
+            throw new CantDoThisWhileAirborneException();
         }
     }
 
-    public void pullLeaf() {
-        Tile frontTile = getTileInfrontOfYou();
-        Tile currentTile = territory.getPlayingField()[this.row][this.column];
-        Tile backTile = getTileBehindYou();
-        if (frontTile.getState() == 3 || frontTile.getState() == 4) {
-            if (backTile != null) {
-                this.moveBackward();
-                currentTile.setState(3);
-                if (frontTile.getState() == 3) {
-                    frontTile.setState(0);
-                } else {
-                    frontTile.setState(0);
-                    frontTile.setState(2);
+    public void pullLeaf() throws CantDoThisWhileAirborneException {
+        if (!this.isAirborne) {
+            Tile frontTile = getTileInfrontOfYou();
+            Tile currentTile = territory.getPlayingField()[this.row][this.column];
+            Tile backTile = getTileBehindYou();
+            if (frontTile.getState() == 3 || frontTile.getState() == 4) {
+                if (backTile != null) {
+                    this.moveBackward();
+                    currentTile.setState(3);
+                    if (frontTile.getState() == 3) {
+                        frontTile.setState(0);
+                    } else {
+                        frontTile.setState(0);
+                        frontTile.setState(2);
+                    }
                 }
             }
+        } else {
+            throw new CantDoThisWhileAirborneException();
+        }
+    }
+
+    public void changeIsAirborne() throws LandedOnLogException, NotEnoughFuelToFlyException {
+        if (isAirborne) {
+            Tile currentTile = this.territory.getPlayingField()[this.row][this.column];
+            if (currentTile.getState() == 1) {
+                throw new LandedOnLogException();
+            } else {
+                isAirborne = false;
+            }
+        } else if (this.fruitFuel.getFruitFuelAsInt() == 0) {
+            throw new NotEnoughFuelToFlyException();
+        } else {
+            isAirborne = true;
         }
     }
 
@@ -159,6 +141,48 @@ public class Ladybug {
         return getTileInfrontOfYou() != null;
     }
 
+    @Invisible
+    public int getDirection() {
+        return direction;
+    }
+
+    @Invisible
+    public void setDirection(int newDirection) {
+        this.direction = newDirection;
+    }
+
+    @Invisible
+    public boolean isAirborne() {
+        return isAirborne;
+    }
+
+    @Invisible
+    public FruitFuel getFruitFuel() {
+        return fruitFuel;
+    }
+
+    @Invisible
+    public void setFruitFuel(int newFruitFuel) {
+        fruitFuel.setFruitFuel(newFruitFuel);
+    }
+
+    @Invisible
+    public int getRow() {
+        return row;
+    }
+
+    @Invisible
+    public int getColumn() {
+        return column;
+    }
+
+    @Invisible
+    public void setTerritory(Territory territory) {
+        this.territory = territory;
+
+    }
+
+    @Invisible
     private Tile getTileInfrontOfYou() {
         Tile frontTile;
         try {
@@ -185,6 +209,7 @@ public class Ladybug {
     }
 
 
+    @Invisible
     public void setCoordinates(int newRow, int newColumn) {
         if (
                 (newRow < 0 || newRow > territory.getRows()) ||
@@ -202,6 +227,7 @@ public class Ladybug {
         this.column = newColumn;
     }
 
+    @Invisible
     private void moveBackward() {
         int newRow = this.getRow();
         int newColumn = this.getColumn();
@@ -239,6 +265,7 @@ public class Ladybug {
         this.column = newColumn;
     }
 
+    @Invisible
     private Tile getTileBehindYou() {
         Tile backTile;
         try {
@@ -262,5 +289,9 @@ public class Ladybug {
             return null;
         }
         return backTile;
+    }
+
+    public Territory getTerritory(){
+        return this.territory;
     }
 }

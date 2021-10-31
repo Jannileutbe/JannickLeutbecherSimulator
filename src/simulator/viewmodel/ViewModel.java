@@ -1,32 +1,28 @@
 package simulator.viewmodel;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
-
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import simulator.model.CurrentEvent;
 import simulator.model.Ladybug;
 import simulator.model.Territory;
+import simulator.view.MyContextMenu;
+import simulator.view.TerritoryPanel;
 import simulator.view.View;
 
 public class ViewModel {
-
-
     private final Territory territory;
     private final CurrentEvent currentEvent;
 
@@ -36,30 +32,36 @@ public class ViewModel {
         View view = new View(territory, this, currentEvent, stage);
     }
 
-    public void handleEvent(MouseEvent me) {
-        int row = (int) (me.getY() / 34) - 1;
-        int column = (int) (me.getX() / 34) - 1;
+    //Wird aufgerufen, wenn Dinge im Spielfeld platziert werden sollen
+    public void handleEventPlacingThings(MouseEvent me) {
+        int clickedRow = (int) (me.getY() / 34) - 1;
+        int clickedColumn = (int) (me.getX() / 34) - 1;
         if (currentEvent.getCurrentEvent()!=null) {
             switch (currentEvent.getCurrentEvent()) {
                 case LADYBUG:
-                    territory.getLadybug().setCoordinates(row, column);
+                    territory.getLadybug().setCoordinates(clickedRow, clickedColumn);
                     System.out.println(territory.getLadybug().getRow() + "" + territory.getLadybug().getColumn());
                     break;
                 case LOG:
-                    territory.getPlayingField()[row][column].setState(1);
-                    System.out.println("Log Updated[" + row + "][" + column + "]");
+                    if (territory.getLadybug().getRow() == clickedRow && territory.getLadybug().getColumn() == clickedColumn) {
+                        //Siehe Zeile 188 ff. oder readme.md
+                        //playErrorSound();
+                    } else {
+                        territory.getPlayingField()[clickedRow][clickedColumn].setState(1);
+                        System.out.println("Log Updated[" + clickedRow + "][" + clickedColumn + "]");
+                    }
                     break;
                 case CHERRY:
-                    territory.getPlayingField()[row][column].setState(2);
-                    System.out.println("Cherry Updated[" + row + "][" + column + "]");
+                    territory.getPlayingField()[clickedRow][clickedColumn].setState(2);
+                    System.out.println("Cherry Updated[" + clickedRow + "][" + clickedColumn + "]");
                     break;
                 case LEAF:
-                    territory.getPlayingField()[row][column].setState(3);
-                    System.out.println("LeafUpdated[" + row + "][" + column + "]");
+                    territory.getPlayingField()[clickedRow][clickedColumn].setState(3);
+                    System.out.println("LeafUpdated[" + clickedRow + "][" + clickedColumn + "]");
                     break;
                 case DELETE:
-                    territory.getPlayingField()[row][column].setState(0);
-                    System.out.println("Tile cleared [" + row + "][" + column + "]");
+                    territory.getPlayingField()[clickedRow][clickedColumn].setState(0);
+                    System.out.println("Tile cleared [" + clickedRow + "][" + clickedColumn + "]");
                     break;
                 case TURNRIGHT:
                     territory.getLadybug().rightTurn();
@@ -68,6 +70,17 @@ public class ViewModel {
                     break;
             }
         }
+    }
+
+    //Erstellt das Menü, welches mit Rechtsklick auf dem Akteur geöffnet wird
+    public MyContextMenu buildMyContextMenu(TerritoryPanel territoryPanel, MouseEvent me){
+        int clickedRow = (int) (me.getY() / 34) - 1;
+        int clickedColumn = (int) (me.getX() / 34) - 1;
+        if (territory.getLadybug().getRow() == clickedRow && territory.getLadybug().getColumn() == clickedColumn) {
+            MyContextMenu myContextMenu = new MyContextMenu(territory.getLadybug(), territoryPanel);
+            return myContextMenu;
+        }
+        return null;
     }
 
     //Mit Martin Knab zusammengearbeitet
@@ -123,7 +136,7 @@ public class ViewModel {
         return userProgramm;
     }
 
-    //Mit Hilfe von Dana Warmbold
+    //Mit Dana Warmbold zusammengearbeitet
     public String getUserPogrammForEditor() {
         String userProgramm = "";
         try (BufferedReader br = new BufferedReader(new FileReader("./resources/programme/JannickLeutbecherSimulator.java"))) {
@@ -156,7 +169,7 @@ public class ViewModel {
         return false;
     }
 
-    //Mit Hilfe von Dana Warmbold
+    //Mit Hilfe von Dana Warmbold und mit Martin Knab zusammengearbeitet
     public Ladybug compileUserProgramm() {
         File root = new File("./resources/programme/");
         File file = new File("./resources/programme/JannickLeutbecherSimulator.java");
@@ -184,4 +197,17 @@ public class ViewModel {
         }
         return userLadybug;
     }
+
+    /*
+    Wirft einen Fehler -> genauer erklärt in readme.md
+    Deswegen auskommentiert
+    private void playErrorSound() {
+        System.err.println("reached the catch");
+        String path = "./resources/death.mp3";
+        Media soundError = new Media(new File(path).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(soundError);
+        mediaPlayer.play();
+    }
+     */
+
 }

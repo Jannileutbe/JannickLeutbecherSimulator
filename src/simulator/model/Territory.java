@@ -88,18 +88,11 @@ public class Territory {
     }
     if (newRows <= ladybug.getRow() || newColumns <= ladybug.getColumn()) {
       ladybug.setCoordinates(0, 0);
+      ladybug.setDirection(1);
     }
     this.playingField = newPlayingfield;
     this.rows = newRows;
     this.columns = newColumns;
-  }
-
-  public void placeWood(int row, int column) {
-    playingField[row][column].setState(1);
-  }
-
-  public void placeFruit(int row, int column) {
-    playingField[row][column].setState(2);
   }
 
   public Ladybug getLadybug() {
