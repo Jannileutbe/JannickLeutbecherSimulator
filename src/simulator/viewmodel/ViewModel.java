@@ -17,6 +17,7 @@ import javax.tools.ToolProvider;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import simulator.model.CurrentEvent;
 import simulator.model.Ladybug;
@@ -38,52 +39,47 @@ public class ViewModel {
     public void handleEvent(MouseEvent me) {
         int row = (int) (me.getY() / 34) - 1;
         int column = (int) (me.getX() / 34) - 1;
-
-        switch (currentEvent.getCurrentEvent()) {
-            case LADYBUG:
-                territory.getLadybug().setCoordinates(row, column);
-                System.out.println(territory.getLadybug().getRow() + "" + territory.getLadybug().getColumn());
-                break;
-            case LOG:
-                territory.getPlayingField()[row][column].setState(1);
-                System.out.println("Log Updated[" + row + "][" + column + "]");
-                break;
-            case CHERRY:
-                territory.getPlayingField()[row][column].setState(2);
-                System.out.println("Cherry Updated[" + row + "][" + column + "]");
-                break;
-            case LEAF:
-                territory.getPlayingField()[row][column].setState(3);
-                System.out.println("LeafUpdated[" + row + "][" + column + "]");
-                break;
-            case DELETE:
-                territory.getPlayingField()[row][column].setState(0);
-                System.out.println("Tile cleared [" + row + "][" + column + "]");
-                break;
-            case TURNRIGHT:
-                territory.getLadybug().rightTurn();
-                break;
-            default:
-                break;
+        if (currentEvent.getCurrentEvent()!=null) {
+            switch (currentEvent.getCurrentEvent()) {
+                case LADYBUG:
+                    territory.getLadybug().setCoordinates(row, column);
+                    System.out.println(territory.getLadybug().getRow() + "" + territory.getLadybug().getColumn());
+                    break;
+                case LOG:
+                    territory.getPlayingField()[row][column].setState(1);
+                    System.out.println("Log Updated[" + row + "][" + column + "]");
+                    break;
+                case CHERRY:
+                    territory.getPlayingField()[row][column].setState(2);
+                    System.out.println("Cherry Updated[" + row + "][" + column + "]");
+                    break;
+                case LEAF:
+                    territory.getPlayingField()[row][column].setState(3);
+                    System.out.println("LeafUpdated[" + row + "][" + column + "]");
+                    break;
+                case DELETE:
+                    territory.getPlayingField()[row][column].setState(0);
+                    System.out.println("Tile cleared [" + row + "][" + column + "]");
+                    break;
+                case TURNRIGHT:
+                    territory.getLadybug().rightTurn();
+                    break;
+                default:
+                    break;
+            }
         }
     }
-
 
     //Mit Martin Knab zusammengearbeitet
     public void safeEditor(TextArea textArea) {
         String editorContent = textArea.getText();
-
         String prefix =
                 "public class JannickLeutbecherSimulator extends simulator.model.Ladybug {\n" +
                         "\n" +
                         "public ";
-        //String prefix = "public class JannickLeutbecherSimulator extends Ladybug { \npublic ";
+
         String postfix = "\n}";
         String savedContent = prefix + editorContent + postfix;
-        byte[] bytes = savedContent.getBytes(StandardCharsets.UTF_8);
-
-        String savedContentUTF8 = new String(bytes, StandardCharsets.UTF_8);
-
         try {
             File usedFile = new File("./resources/programme/JannickLeutbecherSimulator.java");
             FileOutputStream fos = new FileOutputStream(usedFile);
@@ -95,16 +91,6 @@ public class ViewModel {
             System.err.println("Error");
         }
     }
-
-    /*
-    String editorContent = textArea.getText();
-    String prefix = "public class JannickLeutbecherSimulator extends Ladybug { public";
-    String postfix = "}";
-    String savedContent = prefix + editorContent + postfix;
-    File savedContentAsFile = new File("./resources/programme/JannickLeutbecherSimulator.java");
-    sa
-    vedContentAsFile.mkdirs();
-     */
 
     // Mit Dana Warmbold zusammengearbeitet
     //https://stackoverflow.com/questions/40255039/how-to-choose-file-in-java/40255184#40255184
@@ -137,7 +123,7 @@ public class ViewModel {
         return userProgramm;
     }
 
-    // Mit Dana Warmbold zusammengearbeitet
+    //Mit Hilfe von Dana Warmbold
     public String getUserPogrammForEditor() {
         String userProgramm = "";
         try (BufferedReader br = new BufferedReader(new FileReader("./resources/programme/JannickLeutbecherSimulator.java"))) {
@@ -157,45 +143,23 @@ public class ViewModel {
         return userProgramm;
     }
 
-  /* checken obs gebarucht wird...
-  public String getUserProgramm() {
-    String userProgramm = "";
-    try (BufferedReader br = new BufferedReader(new FileReader("./resources/programme/JannickLeutbecherSimulator.java"))) {
-      String line;
-      while ((line = br.readLine()) != null) {
-        userProgramm += line + "\n";
-      }
-    } catch (FileNotFoundException e) {
-      System.err.println("File not found!");
-    } catch (IOException e) {
-      System.err.println("Something went wrong!");
-    }
-    return userProgramm;
-  }
-
-   */
-
     //https://stackabuse.com/java-check-if-string-is-a-number/
     public boolean isNumeric(String string) {
-        int intValue;
-
         if (string == null || string.equals("")) {
             return false;
         }
-
         try {
-            intValue = Integer.parseInt(string);
+            int intValue = Integer.parseInt(string);
             return true;
         } catch (NumberFormatException e) {
         }
         return false;
     }
 
+    //Mit Hilfe von Dana Warmbold
     public Ladybug compileUserProgramm() {
-        //String code = getUserProgramm();
         File root = new File("./resources/programme/");
         File file = new File("./resources/programme/JannickLeutbecherSimulator.java");
-
 
         JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 

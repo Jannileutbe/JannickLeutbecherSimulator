@@ -31,6 +31,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import simulator.model.exceptions.LandedOnLogException;
+import simulator.model.exceptions.NotEnoughFuelToFlyException;
+import simulator.model.exceptions.RanAgainstWallException;
+import simulator.model.exceptions.RanOutsideFieldException;
 import simulator.viewmodel.ViewModel;
 
 
@@ -138,16 +142,28 @@ public class View extends Application {
     openExistingProjectMenuItem.setAccelerator(
         KeyCombination.keyCombination("SHORTCUT+O")
     );
+    openExistingProjectMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        String userProgramm = viewModel.chooseFile();
+        editor.setText(userProgramm);
+      }
+    });
 
     MenuItem compileMenuItem = new MenuItem("_Kompilieren");
     compileMenuItem.setAccelerator(
         KeyCombination.keyCombination("SHORTCUT+K")
     );
-
-    MenuItem printMenuItem = new MenuItem("_Drucken");
-    printMenuItem.setAccelerator(
-        KeyCombination.keyCombination("SHORTCUT+D")
-    );
+    compileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        viewModel.safeEditor(editor);
+        currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
+        Ladybug userLadybug = viewModel.compileUserProgramm();
+        territory.setLadybug(userLadybug);
+        territoryPanel.buildPlayingField(territory);
+      }
+    });
 
     MenuItem quitGameMenuItem = new MenuItem("_Beenden");
     quitGameMenuItem.setOnAction(e -> Platform.exit());
@@ -163,7 +179,7 @@ public class View extends Application {
     });
 
     editingMenu.getItems().addAll(openNewProjectMenuItem, openExistingProjectMenuItem,
-        new SeparatorMenuItem(), compileMenuItem, printMenuItem, new SeparatorMenuItem(),
+        new SeparatorMenuItem(), compileMenuItem, new SeparatorMenuItem(),
         quitGameMenuItem);
 
     return editingMenu;
@@ -173,38 +189,76 @@ public class View extends Application {
     Menu territoryMenu = new Menu("_Territorium");
     territoryMenu.setMnemonicParsing(true);
 
-    Menu saveSubMenu = new Menu("_Speichern");
-    saveSubMenu.getItems().addAll(
-        new MenuItem("XML"), new MenuItem("JAXB"), new MenuItem("Serialisieren")
-    );
+    MenuItem saveMenu = new MenuItem("_Speichern");
+    saveMenu.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.SAFEFILE);
+        viewModel.safeEditor(editor);
+        System.out.println(editor.getText());
+      }
+    });
 
-    Menu loadSubMenu = new Menu("_Laden");
-    loadSubMenu.getItems().addAll(
-        new MenuItem("Von XML"), new MenuItem("Von _JAXB")
-    );
-
-    Menu saveAsPictureSubMenu = new Menu("Als _Bild speichern");
-    saveAsPictureSubMenu.getItems().addAll(
-        new MenuItem("PNG"), new MenuItem("JPEG")
-    );
-
-    MenuItem printTerritoryMenuItem = new MenuItem("_Drucken");
+    MenuItem loadMenu = new MenuItem("_Laden");
+    loadMenu.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        String userProgramm = viewModel.chooseFile();
+        editor.setText(userProgramm);
+      }
+    });
 
     MenuItem changeTerritorySizeMenuItem = new MenuItem("_Größe ändern...");
+    changeTerritorySizeMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        buildResizeWindow();
+      }
+    });
 
     CheckMenuItem placeLadybugMenuItem = new CheckMenuItem("Marienkäfer _platzieren");
+    placeLadybugMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.LADYBUG);
+      }
+    });
 
-    CheckMenuItem placeBerryMenuItem = new CheckMenuItem("_Beere platzieren");
+    CheckMenuItem placeCherryMenuItem = new CheckMenuItem("_Beere platzieren");
+    placeCherryMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.CHERRY);
+      }
+    });
 
-    CheckMenuItem placeWallMenuItem = new CheckMenuItem("_Holz platzieren");
+    CheckMenuItem placeLogMenuItem = new CheckMenuItem("_Holz platzieren");
+    placeLogMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.LOG);
+      }
+    });
 
-    CheckMenuItem placeLeaveMenuItem = new CheckMenuItem("_Blatt platzieren");
+    CheckMenuItem placeLeafMenuItem = new CheckMenuItem("_Blatt platzieren");
+    placeLeafMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.LEAF);
+      }
+    });
 
     CheckMenuItem clearTileMenuItem = new CheckMenuItem("_Kachel löschen");
+    clearTileMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        currentEvent.setCurrentEvent(PossibleEvents.DELETE);
+      }
+    });
 
-    territoryMenu.getItems().addAll(saveSubMenu, loadSubMenu, saveAsPictureSubMenu, printTerritoryMenuItem,
-        changeTerritorySizeMenuItem, new SeparatorMenuItem(), placeLadybugMenuItem, placeBerryMenuItem,
-        placeWallMenuItem, placeLeaveMenuItem, clearTileMenuItem);
+    territoryMenu.getItems().addAll(saveMenu, loadMenu,
+        changeTerritorySizeMenuItem, new SeparatorMenuItem(), placeLadybugMenuItem, placeCherryMenuItem,
+        placeLogMenuItem, placeLeafMenuItem, clearTileMenuItem);
 
     return territoryMenu;
   }
@@ -335,12 +389,21 @@ public class View extends Application {
       }
     });
 
-    Button flayingLadybug = new Button();
-    flayingLadybug.setGraphic(new ImageView(this.gifLadybugFlying));
-    flayingLadybug.setOnAction(new EventHandler<ActionEvent>() {
+    Button flyingLadybug = new Button();
+    flyingLadybug.setGraphic(new ImageView(this.gifLadybugFlying));
+    flyingLadybug.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         currentEvent.setCurrentEvent(PossibleEvents.FLYINGLADYBUG);
+        try {
+          territory.getLadybug().setAirborne(true);
+        } catch(NotEnoughFuelToFlyException e){
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setContentText("Du hast nicht genug Flug-Energie um jetzt loszufliegen!");
+          alert.show();
+        }
+
+        territoryPanel.buildPlayingField(territory);
       }
     });
 
@@ -396,7 +459,20 @@ public class View extends Application {
     moveForward.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-        territory.getLadybug().moveForward();
+        try {
+          territory.getLadybug().moveForward();
+        } catch (RanOutsideFieldException e) {
+          System.err.println("OutsideField, kurz statt lang");
+        } catch (RanAgainstWallException e) {
+          System.err.println("AgainstWall, kurz statt lang");
+        } catch (LandedOnLogException e) {
+          territory.getLadybug().setFruitFuel(0);
+          territory.getLadybug().setCoordinates(0, 0);
+          territory.getLadybug().setDirection(1);
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setContentText("Du bist auf einem Baumstumpf gelandet und abgestürzt!");
+          alert.show();
+        }
         territoryPanel.buildPlayingField(territory);
       }
     });
@@ -429,8 +505,6 @@ public class View extends Application {
     Button fruitFuel = new Button("FruitFuel: ");
     fruitFuel.textProperty().bind(territory.getLadybug().getFruitFuel().valueProperty().asString());
 
-    Label spacing = new Label("     ");
-
     Button start = new Button();
     start.setGraphic(new ImageView(this.imagePlay));
     start.setMinSize(40, 40);
@@ -450,9 +524,14 @@ public class View extends Application {
     stop.setGraphic(new ImageView(this.imageStop));
     stop.setMinSize(40, 40);
 
+    Separator separator1 = new Separator();
+    Separator separator2 = new Separator();
+    Separator separator3 = new Separator();
+    Separator separator4 = new Separator();
 
-    toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile, resizeTerritory, ladybug, flayingLadybug, cherry,
-        leaf, log, delete, turnRight, moveForward, eatFruit, pullLeaf, fruitFuelLabel, fruitFuel, spacing, start, pause, stop);
+
+    toolBar.getItems().addAll(newFile, openFile, safeFile, compileFile, resizeTerritory, separator1, ladybug, flyingLadybug, cherry,
+        leaf, log, delete, separator2, turnRight, moveForward, eatFruit, pullLeaf, separator3, fruitFuelLabel, fruitFuel, separator4, start, pause, stop);
 
     return toolBar;
   }
@@ -467,7 +546,7 @@ public class View extends Application {
     HBox hBoxRows = new HBox();
     hBoxRows.setAlignment(Pos.CENTER);
 
-    Label newRowsLabel = new Label("    New Rows: ");
+    Label newRowsLabel = new Label("     New Rows: ");
     TextField newRowsTextField = new TextField("");
     newRowsTextField.setMaxWidth(100);
 

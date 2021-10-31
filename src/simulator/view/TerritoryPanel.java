@@ -31,7 +31,11 @@ public class TerritoryPanel extends Region {
   private final Image imageLadybug90Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug90Degree.png"));
   private final Image imageLadybug180Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug180Degree.png"));
   private final Image imageLadybug270Degree = new Image(new FileInputStream("./resources/LadybugAdventure/Ladybug270Degree.png"));
-  private final Image imageFlyingLadybug = new Image(new FileInputStream("./resources/LadybugAdventure/flyingLadybug.png"));
+  private final Image imageFlyingLadybug = new Image(new FileInputStream("./resources/LadybugAdventure/FlyingLadybug.png"));
+  private final Image imageFlyingLadybug90Degree = new Image(new FileInputStream("./resources/LadybugAdventure/FlyingLadybug90Degree.png"));
+  private final Image imageFlyingLadybug180Degree = new Image(new FileInputStream("./resources/LadybugAdventure/FlyingLadybug180Degree.png"));
+  private final Image imageFlyingLadybug270Degree = new Image(new FileInputStream("./resources/LadybugAdventure/FlyingLadybug270Degree.png"));
+
 
   public TerritoryPanel(Territory territory, ViewModel viewModel) throws FileNotFoundException {
     this.territory = territory;
@@ -56,8 +60,6 @@ public class TerritoryPanel extends Region {
         buildPlayingField(territory);
       }
     });
-
-
 
     int xCoordinate;
     int yCoordinate = 34;
@@ -108,7 +110,6 @@ public class TerritoryPanel extends Region {
   public void printLadybug() {
     int xCoordinateLadybug = 34 + ((territory.getLadybug().getColumn() * 34) + 1);
     int yCoordinateLadybug = 34 + ((territory.getLadybug().getRow() * 34) + 1);
-
     if (!territory.getLadybug().isAirborne()) {
       switch (territory.getLadybug().getDirection()) {
         case 0:
@@ -124,8 +125,19 @@ public class TerritoryPanel extends Region {
           gc.drawImage(this.imageLadybug270Degree, xCoordinateLadybug, yCoordinateLadybug);
       }
     } else {
-      gc.drawImage(this.imageFlyingLadybug, xCoordinateLadybug, yCoordinateLadybug);
+      switch (territory.getLadybug().getDirection()) {
+        case 0:
+          gc.drawImage(this.imageFlyingLadybug, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 1:
+          gc.drawImage(this.imageFlyingLadybug90Degree, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 2:
+          gc.drawImage(this.imageFlyingLadybug180Degree, xCoordinateLadybug, yCoordinateLadybug);
+          break;
+        case 3:
+          gc.drawImage(this.imageFlyingLadybug270Degree, xCoordinateLadybug, yCoordinateLadybug);
+      }
     }
   }
-
 }
