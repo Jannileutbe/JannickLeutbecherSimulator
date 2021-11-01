@@ -18,6 +18,7 @@ import javafx.scene.media.MediaPlayer;
 import simulator.model.CurrentEvent;
 import simulator.model.Ladybug;
 import simulator.model.Territory;
+import simulator.model.exceptions.CompilerException;
 import simulator.view.MyContextMenu;
 import simulator.view.TerritoryPanel;
 import simulator.view.View;
@@ -170,13 +171,17 @@ public class ViewModel {
     }
 
     //Mit Hilfe von Dana Warmbold und mit Martin Knab zusammengearbeitet
-    public Ladybug compileUserProgramm() {
+    public Ladybug compileUserProgramm() throws CompilerException{
         File root = new File("./resources/programme/");
         File file = new File("./resources/programme/JannickLeutbecherSimulator.java");
 
         JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 
-        javac.run(null, null, null, file.getPath());
+
+        int compiler = javac.run(null, null, null, file.getPath());
+        if (compiler != 0) {
+            throw new CompilerException();
+        }
         Class cls = null;
         Ladybug userLadybug = null;
         try {

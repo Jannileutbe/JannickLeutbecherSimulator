@@ -1,6 +1,5 @@
 package simulator.view;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.CompilerException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -480,12 +479,18 @@ public class View extends Application {
             public void handle(ActionEvent event) {
                 viewModel.safeEditor(editor);
                 currentEvent.setCurrentEvent(PossibleEvents.COMPILEFILE);
-                Ladybug userLadybug = viewModel.compileUserProgramm();
-                territory.setLadybug(userLadybug);
-                territoryPanel.buildPlayingField(territory);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("Es wurd erfolgreich kompiliert!");
-                alert.show();
+                try {
+                    Ladybug userLadybug = viewModel.compileUserProgramm();
+                    territory.setLadybug(userLadybug);
+                    territoryPanel.buildPlayingField(territory);
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("Es wurd erfolgreich kompiliert!");
+                    alert.show();
+                }catch (CompilerException e) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("Es wurd nicht erfolgreich kompiliert!");
+                    alert.show();
+                }
             }
         });
 
@@ -638,7 +643,7 @@ public class View extends Application {
 
         // Quelle für das Binding zwischen Button und dem FruitFuel-Wert
         // https://stackoverflow.com/questions/33146167/javafx-binding-label-with-int-value
-        Button fruitFuel = new Button("FruitFuel: ");
+        Button fruitFuel = new Button();
         fruitFuel.textProperty().bind(territory.getLadybug().getFruitFuel().valueProperty().asString());
 
         Button start = new Button();
